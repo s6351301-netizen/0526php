@@ -30,7 +30,7 @@ function find($table,$id){
  return $row;
 }
 
-function update($table,$id,$cols){
+function update($table,$arg,$cols){
     global $pdo;
 
     $sql="UPDATE $table SET ";
@@ -40,11 +40,52 @@ function update($table,$id,$cols){
     }
      
     $sql .= join(",",$tmp);
-    $sql .= " WHERE `id`='$id'";
+
+
+    if(is_numeric($arg)){
+        $sql .= " WHERE `id`='$arg'";
+    }else{
+        $tmp=[];
+        foreach($arg as $key=>$val){
+            $tmp[]="`$key`='$val'";
+        }
+        $sql .= " WHERE ".join(" AND ", $tmp);
+    }
 
     //echo $sql;
  return $pdo->exec($sql);
 }
+
+
+function insert($table,$arg){
+    global $pdo;
+
+    $keys=array_keys($arg);
+
+    $sql="INSERT INTO $table (`" . join("`,`",$keys) . "`) VALUES ('" . join("','",$arg) . "')";
+    echo $sql;
+return $pdo->exec($sql);
+}
+
+
+function delete($table,$arg){
+    global $pdo;
+    $sql="DELETE FROM `$table` ";
+    if(is_numeric($arg)){
+        $sql .=" WHERE `id`='$arg'";
+    }else{
+        $tmp=[];
+        foreach($arg as $key => $val ){
+            $tmp[]="`$key`='$val'";
+        }
+        $sql .=" WHERE ".join(" AND ",$tmp);
+    }
+   // echo $sql;
+    return $pdo->exec($sql);
+
+}
+
+
 
 /* echo "<pre>";
  print_r(all('status'));
@@ -56,7 +97,11 @@ echo "<pre>";
  print_r($row);
  echo "</pre>"; */
 
- update('status',4,['note'=>'持有國中修(結)業證明書者(修畢三年以上)']);
+ //update('students',['dept'=>'5'],['dept'=>'1']);
+/*  $arg=['code'=>'101',' status'=>'不想升學','note'=>"不想升學了，想去工作了"];
+/*  insert('status',$arg) */
+
+//echo delete('students',['dept'=>'1']);
 ?>
 
 
